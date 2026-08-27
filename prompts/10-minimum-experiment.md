@@ -6,6 +6,10 @@ useWhen: 适用于不确定要不要买、要不要做或要不要换，想先�
 category: 决策
 keywords: [实验, 验证, 低成本, 可逆, 试错, 决策, 假设]
 variables: [选择或想法, 周期]
+intent: minimum-experiment
+positiveExamples: [我不确定要不要买这件东西能不能先试试, 我在做不做之间犹豫先设计最小实验, 不想空想先做个小测试, 这个决定能先小规模试运行吗, 先低成本验证再决定, 有什么可逆的试错办法]
+negativeExamples: [直接告诉我该选哪个, 解释一个陌生概念, 挖掘我的职业天赋]
+primaryVariable: 选择或想法
 ---
 
 我正在纠结的是：【填写你的选择或想法】。

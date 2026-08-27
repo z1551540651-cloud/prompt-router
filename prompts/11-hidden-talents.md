@@ -6,6 +6,10 @@ useWhen: 适用于想了解自己的优势、适合什么工作以及为什么�
 category: 认识自己
 keywords: [天赋, 优势, 心流, 生涯, 能量, 怪癖, 嫉妒, 自我认识]
 variables: []
+intent: self-understanding
+positiveExamples: [我想知道自己真正擅长什么, 帮我挖掘职业天赋, 我不知道自己适合什么工作, 想发现被忽视的优势, 哪些事情是我的无意识优势, 我想了解自己的心流和能量模式]
+negativeExamples: [我该选哪份工作, 设计三个未来人生方案, 解释职业概念]
+primaryVariable: 问题
 ---
 
 # Role：深度天赋挖掘机

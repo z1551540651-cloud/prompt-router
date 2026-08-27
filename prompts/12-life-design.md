@@ -6,6 +6,10 @@ useWhen: 适用于对未来工作、生活方向迷茫，想设计多条可能�
 category: 认识自己
 keywords: [人生, 规划, 未来, 职业, 方向, 设计, 原型, 奥德赛]
 variables: []
+intent: life-direction
+positiveExamples: [想做三个不同的人生方案, 我对未来工作和生活方向迷茫, 不知道未来该走哪条路, 想设计五年后的生活, 对人生方向没有头绪, 我想重新规划职业和生活]
+negativeExamples: [挖掘我具体擅长的天赋, 两个工作选哪个, 做一个低成本职业实验]
+primaryVariable: 问题
 ---
 
 # Role：人生设计师

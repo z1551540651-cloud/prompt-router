@@ -1,6 +1,18 @@
 import type { Prompt } from "./types";
 
-const SUPPORTED_KEYS = new Set(["id", "name", "description", "useWhen", "category", "keywords", "variables"]);
+const SUPPORTED_KEYS = new Set([
+  "id",
+  "name",
+  "description",
+  "useWhen",
+  "category",
+  "keywords",
+  "variables",
+  "intent",
+  "positiveExamples",
+  "negativeExamples",
+  "primaryVariable",
+]);
 
 function cleanScalar(value: string): string {
   const trimmed = value.trim();
@@ -46,7 +58,7 @@ export function parsePromptMarkdown(fileName: string, source: string): Prompt {
     if (separator === -1) continue;
     const key = line.slice(0, separator).trim();
     const value = line.slice(separator + 1).trim();
-    if (key === "keywords" || key === "variables") fields[key] = parseList(value);
+    if (key === "keywords" || key === "variables" || key === "positiveExamples" || key === "negativeExamples") fields[key] = parseList(value);
     else if (SUPPORTED_KEYS.has(key)) fields[key] = cleanScalar(value);
   }
 
@@ -59,7 +71,22 @@ export function parsePromptMarkdown(fileName: string, source: string): Prompt {
   const variables = Array.isArray(fields.variables) ? fields.variables : [];
   const body = bodyLines.join("\n").replace(/^\n+/, "").replace(/\n+$/, "");
 
-  return { id, fileName, name, description, useWhen, category, keywords, variables, body, rawFrontmatter };
+  return {
+    id,
+    fileName,
+    name,
+    description,
+    useWhen,
+    category,
+    keywords,
+    variables,
+    intent: typeof fields.intent === "string" && fields.intent ? fields.intent : undefined,
+    positiveExamples: Array.isArray(fields.positiveExamples) ? fields.positiveExamples : undefined,
+    negativeExamples: Array.isArray(fields.negativeExamples) ? fields.negativeExamples : undefined,
+    primaryVariable: typeof fields.primaryVariable === "string" && fields.primaryVariable ? fields.primaryVariable : undefined,
+    body,
+    rawFrontmatter,
+  };
 }
 
 function formatList(values: string[]): string {
@@ -74,6 +101,11 @@ function upsertLine(lines: string[], key: string, value: string): string[] {
   return next;
 }
 
+function upsertOptionalLine(lines: string[], key: string, value: string | string[] | undefined): string[] {
+  if (value === undefined) return lines.filter((line) => !line.trimStart().startsWith(`${key}:`));
+  return upsertLine(lines, key, Array.isArray(value) ? formatList(value) : value);
+}
+
 export function serializePromptMarkdown(prompt: Prompt): string {
   let frontmatter = [...prompt.rawFrontmatter];
   frontmatter = upsertLine(frontmatter, "id", prompt.id);
@@ -83,5 +115,9 @@ export function serializePromptMarkdown(prompt: Prompt): string {
   frontmatter = upsertLine(frontmatter, "category", prompt.category);
   frontmatter = upsertLine(frontmatter, "keywords", formatList(prompt.keywords));
   frontmatter = upsertLine(frontmatter, "variables", formatList(prompt.variables));
+  frontmatter = upsertOptionalLine(frontmatter, "intent", prompt.intent);
+  frontmatter = upsertOptionalLine(frontmatter, "positiveExamples", prompt.positiveExamples);
+  frontmatter = upsertOptionalLine(frontmatter, "negativeExamples", prompt.negativeExamples);
+  frontmatter = upsertOptionalLine(frontmatter, "primaryVariable", prompt.primaryVariable);
   return `---\n${frontmatter.join("\n")}\n---\n\n${prompt.body.trim()}\n`;
 }

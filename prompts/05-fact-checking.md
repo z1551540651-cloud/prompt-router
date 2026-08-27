@@ -6,6 +6,10 @@ useWhen: 适用于判断一条新闻、数据、观点或方案到底靠不靠�
 category: 学习
 keywords: [核查, 事实, 真假, 证据, 幻觉, 数据, 观点]
 variables: [说法]
+intent: fact-checking
+positiveExamples: [这条新闻是真的吗, 我想判断一个结论靠不靠谱, 这个方案的依据是什么, 这个数据有没有证据, 这个观点是否事实准确, 帮我核查这句话]
+negativeExamples: [怎么解释这个概念, 两个方案怎么选, 方案从本质怎么推导]
+primaryVariable: 说法
 ---
 
 我要核查的说法是：【粘贴观点、结论、数据或方案】。

@@ -6,6 +6,10 @@ useWhen: 适用于不知道自己真正想问什么、问题很乱或卡在表�
 category: 问清问题
 keywords: [困惑, 问题, 问清楚, 追问, 苏格拉底]
 variables: [困惑]
+intent: clarify-question
+positiveExamples: [我说不清自己到底卡在哪里, 不知道该怎么描述现在的困境, 我不知道真正想问什么, 这个问题太乱想先理清楚, 我好像把事实和判断混在一起, 这件事该从哪里问起]
+negativeExamples: [我想知道一个概念怎么工作, 我在两个选项之间犹豫, 这条新闻是真的吗]
+primaryVariable: 困惑
 ---
 
 我的困惑是：【尽量具体地描述发生了什么、你怎么理解，以及你卡在哪里】。

@@ -6,6 +6,10 @@ useWhen: 适用于看到好产品、网站、视频或方案，想模仿其做�
 category: 学习
 keywords: [拆解, 模仿, 学习, 网站, 产品, 成品, 作品]
 variables: [优秀范例, 想学会的内容]
+intent: reverse-deconstruction
+positiveExamples: [给我分析这份成品方案的结构, 我想拆解竞品页面的设计方法, 想从一个优秀 App 学会它怎么做, 这个网站是怎么做出来的, 我想模仿这个视频的做法, 拆解一个优秀产品]
+negativeExamples: [从基本事实重新推导方案, 研究这个行业的发展历史, 这个产品值不值得买]
+primaryVariable: 优秀范例
 ---
 
 我想拆解的优秀范例是：【粘贴产品页面、网页、方案、流程说明、数据看板或其他成品】。

@@ -7,6 +7,10 @@ export type Prompt = {
   category: string;
   keywords: string[];
   variables: string[];
+  intent?: string;
+  positiveExamples?: string[];
+  negativeExamples?: string[];
+  primaryVariable?: string;
   body: string;
   rawFrontmatter: string[];
 };

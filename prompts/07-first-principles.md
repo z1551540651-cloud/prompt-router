@@ -6,6 +6,10 @@ useWhen: 适用于现有流程不断打补丁、方案越来越复杂，想从�
 category: 解决问题
 keywords: [第一性原理, 本质, 架构, 流程, 路径依赖, 重构]
 variables: [问题]
+intent: first-principles
+positiveExamples: [不要沿用惯例重新推导这个方案, 这个架构一直打补丁想回到底层事实, 帮我找出真正目标和假设, 为什么这个流程需要这么多步骤能否从基本事实重来, 重新设计系统架构, 从最基本的原理想想]
+negativeExamples: [多个专业视角会诊, 两个方案选哪个, 借用其他领域解决]
+primaryVariable: 问题
 ---
 
 我想解决的问题是：【填写你的问题】。

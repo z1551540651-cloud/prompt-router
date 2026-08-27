@@ -6,6 +6,10 @@ useWhen: 适用于看不懂技术、概念或数据库名词，想从小白到�
 category: 学习
 keywords: [学习, 概念, 听不懂, 解释, 小白, 专业]
 variables: [概念或问题]
+intent: concept-explanation
+positiveExamples: [地球为什么是圆的, Docker 是怎么工作的, 这个概念到底是什么, 请用小白能懂的方式解释, 我听不懂这个技术名词, 这个原理怎么理解]
+negativeExamples: [要不要买这个产品, 拆解这个成品方案, 这个说法是真的吗]
+primaryVariable: 概念或问题
 ---
 
 我想学习的是：【填写概念或问题】。

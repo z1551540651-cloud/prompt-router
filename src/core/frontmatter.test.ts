@@ -46,4 +46,50 @@ describe("prompt markdown frontmatter", () => {
     expect(serialized).toContain("name: 新名");
     expect(serialized).toContain("正文");
   });
+
+  it("parses optional routing metadata", () => {
+    const prompt = parsePromptMarkdown("demo.md", `---
+id: demo
+name: 示例
+intent: decision
+positiveExamples: [我该不该买, 两个方案怎么选]
+negativeExamples: [请解释这个概念]
+primaryVariable: 决定
+---
+
+正文`);
+
+    expect(prompt.intent).toBe("decision");
+    expect(prompt.positiveExamples).toEqual(["我该不该买", "两个方案怎么选"]);
+    expect(prompt.negativeExamples).toEqual(["请解释这个概念"]);
+    expect(prompt.primaryVariable).toBe("决定");
+  });
+
+  it("keeps old prompts compatible when routing metadata is absent", () => {
+    const prompt = parsePromptMarkdown("old.md", "---\nid: old\nname: 旧模板\n---\n\n正文");
+
+    expect(prompt.intent).toBeUndefined();
+    expect(prompt.positiveExamples).toBeUndefined();
+    expect(prompt.negativeExamples).toBeUndefined();
+    expect(prompt.primaryVariable).toBeUndefined();
+  });
+
+  it("serializes routing metadata without dropping existing frontmatter", () => {
+    const source = parsePromptMarkdown("demo.md", `---
+id: demo
+name: 示例
+intent: decision
+positiveExamples: [我该不该买]
+negativeExamples: [解释概念]
+primaryVariable: 决定
+---
+
+正文`);
+    const serialized = serializePromptMarkdown(source);
+
+    expect(serialized).toContain("intent: decision");
+    expect(serialized).toContain("positiveExamples: [我该不该买]");
+    expect(serialized).toContain("negativeExamples: [解释概念]");
+    expect(serialized).toContain("primaryVariable: 决定");
+  });
 });
