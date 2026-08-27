@@ -1,6 +1,6 @@
 {
   "name": "prompt-router",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Local-first personal prompt library and router",
   "author": "Prompt Router",
   "private": true,
