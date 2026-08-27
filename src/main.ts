@@ -6,6 +6,7 @@ import { promisify } from "node:util";
 import { PromptStore } from "./core/prompt-store";
 import { searchPrompts } from "./core/search";
 import { routeQuestion } from "./core/router";
+import { shouldReopenPanel } from "./core/use-feedback";
 import type { AppSettings, PasteResult, Prompt } from "./core/types";
 
 const execFileAsync = promisify(execFile);
@@ -124,7 +125,12 @@ function registerIpc(): void {
   ipcMain.handle("use-prompt", async (_event, text: string) => {
     clipboard.writeText(text);
     panel?.hide();
-    return pasteIntoPreviousApp();
+    const result = await pasteIntoPreviousApp();
+    if (shouldReopenPanel(result)) {
+      panel?.show();
+      panel?.focus();
+    }
+    return result;
   });
   ipcMain.handle("get-settings", async () => readSettings());
   ipcMain.handle("choose-prompt-directory", async () => {
