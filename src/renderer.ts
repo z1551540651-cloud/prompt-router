@@ -1,4 +1,5 @@
 import type { Prompt, PromptRouterApi, PromptSearchResult, RouteCandidate, RouteResult } from "./core/types";
+import { renderPrompt } from "./core/render-prompt";
 
 declare global {
   interface Window {
@@ -13,6 +14,7 @@ const inputLabel = document.querySelector<HTMLLabelElement>("#input-label")!;
 const runButton = document.querySelector<HTMLButtonElement>("#run-button")!;
 const routeShortcut = document.querySelector<HTMLButtonElement>("#route-shortcut")!;
 const resultsElement = document.querySelector<HTMLElement>("#results")!;
+const previewElement = document.querySelector<HTMLElement>("#preview")!;
 const editorElement = document.querySelector<HTMLElement>("#editor")!;
 const statusElement = document.querySelector<HTMLElement>("#status")!;
 const promptCountElement = document.querySelector<HTMLElement>("#prompt-count")!;
@@ -25,6 +27,8 @@ let searchResults: PromptSearchResult[] = [];
 let routeResult: RouteResult | null = null;
 let selectedIndex = 0;
 let editingPrompt: Prompt | null = null;
+let previewText = "";
+let previewTemplateText = "";
 
 function escapeHtml(value: string): string {
   return value.replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[character] ?? character));
@@ -33,6 +37,13 @@ function escapeHtml(value: string): string {
 function setStatus(message: string, error = false): void {
   statusElement.textContent = message;
   statusElement.classList.toggle("error", error);
+}
+
+function hidePreview(): void {
+  previewText = "";
+  previewTemplateText = "";
+  previewElement.classList.add("hidden");
+  previewElement.innerHTML = "";
 }
 
 function updateModeUi(): void {
@@ -44,6 +55,7 @@ function updateModeUi(): void {
   routeShortcut.classList.toggle("hidden", routeMode);
   selectedIndex = 0;
   routeResult = null;
+  hidePreview();
   editorElement.classList.add("hidden");
   if (!routeMode) void refreshSearch();
   else renderResults();
@@ -72,9 +84,13 @@ function renderSearchResults(): void {
 function renderRouteResults(): void {
   const candidates = routeResult?.candidates ?? [];
   if (!candidates.length) {
-    resultsElement.innerHTML = routeResult?.status === "unavailable"
-      ? `<div class="empty-state">提示词库为空，请先添加 Markdown 提示词。</div>`
-      : `<div class="empty-state">输入问题后点击“开始匹配”。</div>`;
+    if (routeResult?.status === "unavailable") {
+      resultsElement.innerHTML = `<div class="empty-state">提示词库为空，请先添加 Markdown 提示词。</div>`;
+    } else if (routeResult?.status === "needsManualChoice") {
+      resultsElement.innerHTML = `<div class="empty-state">暂时无法判断适合哪条提示词。请补充问题背景，或切换到“搜索提示词”手动选择。</div>`;
+    } else {
+      resultsElement.innerHTML = `<div class="empty-state">输入问题后点击“开始匹配”。</div>`;
+    }
     return;
   }
   const banner = routeResult?.providerUsed ? "AI 已参与判断，仍请你确认候选" : routeResult?.status === "needsManualChoice" ? "本地规则不够确定，请手动确认" : "本地规则已找到高置信度候选";
@@ -87,7 +103,7 @@ function renderRouteResults(): void {
       </div>
       <div class="card-actions">
         <button class="secondary-button" data-action="edit" data-index="${index}">编辑</button>
-        <button class="primary-button" data-action="use" data-index="${index}">确认使用</button>
+        <button class="primary-button" data-action="use" data-index="${index}">生成并复制</button>
       </div>
     </article>
   `).join("");
@@ -99,6 +115,7 @@ function renderResults(): void {
 }
 
 function renderEditor(prompt: Prompt): void {
+  hidePreview();
   editingPrompt = prompt;
   editorElement.classList.remove("hidden");
   editorElement.innerHTML = `
@@ -151,14 +168,33 @@ function currentCandidate(index: number): Prompt | undefined {
   return mode === "search" ? searchResults[index]?.prompt : routeResult?.candidates[index]?.prompt;
 }
 
-function renderPrompt(prompt: Prompt, question = ""): string {
-  let body = prompt.body;
-  for (const variable of prompt.variables) {
-    const value = variable === "问题" && question ? question : "";
-    const escaped = variable.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    body = body.replace(new RegExp(`【${escaped}】`, "g"), value).replace(new RegExp(`\\{\\{${escaped}\\}\\}`, "g"), value);
+async function copyText(text: string): Promise<void> {
+  if (!text) return;
+  try {
+    const result = await window.promptRouter.usePrompt(text);
+    setStatus(result.message, !result.pasted && !result.clipboardReady);
+    hidePreview();
+  } catch (error) {
+    setStatus(error instanceof Error ? error.message : "使用提示词失败", true);
   }
-  return question ? `${body.trim()}\n\n用户问题：${question.trim()}` : body.trim();
+}
+
+function showPreview(prompt: Prompt, question: string): void {
+  previewText = renderPrompt(prompt, {}, question);
+  previewTemplateText = prompt.body.trim();
+  previewElement.classList.remove("hidden");
+  previewElement.innerHTML = `
+    <div class="editor-title-row"><h2>完整提示词预览</h2><span class="editor-id">复制前请确认</span></div>
+    <pre class="preview-text">${escapeHtml(previewText)}</pre>
+    <div class="preview-actions">
+      <button id="cancel-preview" class="secondary-button">返回</button>
+      <button id="copy-template" class="secondary-button">复制原始模板</button>
+      <button id="copy-preview" class="primary-button">复制完整提示词</button>
+    </div>`;
+  document.querySelector<HTMLButtonElement>("#cancel-preview")!.addEventListener("click", hidePreview);
+  document.querySelector<HTMLButtonElement>("#copy-template")!.addEventListener("click", () => void copyText(previewTemplateText));
+  document.querySelector<HTMLButtonElement>("#copy-preview")!.addEventListener("click", () => void copyText(previewText));
+  previewElement.scrollIntoView({ block: "nearest", behavior: "smooth" });
 }
 
 async function useCandidate(index: number): Promise<void> {
@@ -166,12 +202,7 @@ async function useCandidate(index: number): Promise<void> {
   if (!selected) return;
   const prompt = promptFromEditor() ?? selected;
   const question = mode === "route" ? mainInput.value : "";
-  try {
-    const result = await window.promptRouter.usePrompt(renderPrompt(prompt, question));
-    setStatus(result.message, !result.pasted && !result.clipboardReady);
-  } catch (error) {
-    setStatus(error instanceof Error ? error.message : "使用提示词失败", true);
-  }
+  showPreview(prompt, question);
 }
 
 async function refreshPrompts(): Promise<void> {
@@ -182,6 +213,7 @@ async function refreshPrompts(): Promise<void> {
 
 async function refreshSearch(): Promise<void> {
   if (mode !== "search") return;
+  hidePreview();
   searchResults = await window.promptRouter.searchPrompts(mainInput.value);
   selectedIndex = Math.min(selectedIndex, Math.max(0, searchResults.length - 1));
   renderResults();
@@ -194,6 +226,7 @@ async function runRoute(): Promise<void> {
     return;
   }
   runButton.disabled = true;
+  hidePreview();
   setStatus("正在判断适合的提示词…");
   try {
     routeResult = await window.promptRouter.routeQuestion(question);
