@@ -1,0 +1,31 @@
+{
+  "name": "prompt-router",
+  "version": "0.1.0",
+  "description": "Local-first personal prompt library and router",
+  "author": "Prompt Router",
+  "private": true,
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "node scripts/clean-dist.mjs && tsc -p tsconfig.json && tsc -p tsconfig.renderer.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "start": "pnpm build && electron .",
+    "dev": "pnpm build && electron .",
+    "dist:mac": "pnpm build && electron-builder --mac",
+    "dist:win": "pnpm build && electron-builder --win"
+  },
+  "build": {
+    "appId": "local.prompt-router",
+    "productName": "Prompt Router",
+    "files": ["dist/**/*", "index.html", "styles.css", "prompts/**/*", "README.md"],
+    "mac": { "category": "public.app-category.productivity" },
+    "win": { "target": "nsis" }
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "electron": "latest",
+    "electron-builder": "latest",
+    "typescript": "latest",
+    "vitest": "latest"
+  }
+}
