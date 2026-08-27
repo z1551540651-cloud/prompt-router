@@ -45,8 +45,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Compile application
+        run: pnpm build
+
       - name: Build installer
-        run: pnpm exec electron-builder ${{ matrix.args }}
+        run: pnpm exec electron-builder ${{ matrix.args }} --publish never
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
