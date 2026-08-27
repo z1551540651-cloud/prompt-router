@@ -36,4 +36,41 @@ describe("prompt search", () => {
 
     expect(results.map((item) => item.prompt.id)).toEqual(["exact", "keyword", "body"]);
   });
+
+  it("prefers a declared intent example over generic words", () => {
+    const results = searchPrompts(
+      [
+        prompt({
+          id: "decision",
+          name: "双向钢人论证",
+          intent: "decision",
+          positiveExamples: ["我在两个方案之间犹豫不知道选哪个"],
+          negativeExamples: ["请解释这个概念"],
+          keywords: ["方案", "选择"],
+        }),
+        prompt({
+          id: "expert",
+          name: "专家会诊",
+          intent: "multi-perspective-solution",
+          keywords: ["方案", "问题"],
+        }),
+      ],
+      "我在两个方案之间犹豫不知道选哪个",
+    );
+
+    expect(results[0]?.prompt.id).toBe("decision");
+    expect(results[0]?.score).toBeGreaterThan(results[1]?.score ?? 0);
+  });
+
+  it("penalizes a candidate when the query matches its negative example", () => {
+    const results = searchPrompts(
+      [
+        prompt({ id: "concept", intent: "concept-explanation", positiveExamples: ["解释一个陌生概念"], negativeExamples: ["要不要买这个产品"] }),
+        prompt({ id: "decision", intent: "decision", positiveExamples: ["要不要买这个产品"] }),
+      ],
+      "要不要买这个产品",
+    );
+
+    expect(results[0]?.prompt.id).toBe("decision");
+  });
 });

@@ -3,13 +3,13 @@ import type { Prompt, RouteCandidate, RouteProvider, RouteResult } from "./types
 
 function reasonFor(prompt: Prompt, question: string, score: number): string {
   const lowerQuestion = question.toLocaleLowerCase("zh-CN");
+  const intent = matchedIntent(prompt, question);
+  if (intent) return `识别到${intent}`;
   const hits = prompt.keywords.filter((keyword) => lowerQuestion.includes(keyword.toLocaleLowerCase("zh-CN")));
   if (hits.length) return `命中关键词：${hits.join("、")}`;
   if (prompt.name.toLocaleLowerCase("zh-CN").includes(lowerQuestion)) return "匹配提示词名称";
   if (prompt.category && lowerQuestion.includes(prompt.category.toLocaleLowerCase("zh-CN"))) return `匹配分类：${prompt.category}`;
   if (prompt.useWhen && prompt.useWhen.toLocaleLowerCase("zh-CN").includes(lowerQuestion)) return "匹配适用场景";
-  const intent = matchedIntent(prompt, question);
-  if (intent) return `识别到${intent}`;
   if (score > 0) return "匹配提示词描述或正文";
   return "本地规则没有找到高置信度匹配";
 }
@@ -19,7 +19,7 @@ function localCandidates(question: string, prompts: Prompt[]): RouteCandidate[] 
   if (searched.length) {
     return searched.slice(0, 3).map(({ prompt, score }) => ({ prompt, score, reason: reasonFor(prompt, question, score) }));
   }
-  return prompts.slice(0, 3).map((prompt) => ({ prompt, score: 0, reason: reasonFor(prompt, question, 0) }));
+  return [];
 }
 
 function localResult(question: string, prompts: Prompt[]): RouteResult {
@@ -27,7 +27,7 @@ function localResult(question: string, prompts: Prompt[]): RouteResult {
   const candidates = localCandidates(question, prompts);
   const topScore = candidates[0]?.score ?? 0;
   const secondScore = candidates[1]?.score ?? 0;
-  const confident = topScore >= 60 || topScore - secondScore >= 20;
+  const confident = topScore >= 80 || topScore >= 45 && topScore - secondScore >= 25;
   return { status: confident ? "matched" : "needsManualChoice", candidates, providerUsed: false };
 }
 

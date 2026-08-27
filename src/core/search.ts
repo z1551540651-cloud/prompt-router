@@ -1,20 +1,37 @@
 import type { Prompt, PromptSearchResult } from "./types";
+import { containsPhrase, normalizeRouteText, sharedNgramScore } from "./route-signals";
 
 function normalize(value: string): string {
   return value.trim().toLocaleLowerCase("zh-CN");
 }
 
-const conceptExplanationSignals = /为什么|是什么|怎么理解|原理|如何工作|怎么运作|解释一下|讲清楚/;
+const GENERIC_WORDS = new Set(["问题", "方案", "产品", "设计", "决定", "行业", "数据", "专业"]);
+const INTENT_LABELS: Record<string, string> = {
+  "clarify-question": "问清问题意图",
+  "concept-explanation": "概念解释意图",
+  "reverse-deconstruction": "反向拆解意图",
+  research: "系统研究意图",
+  "fact-checking": "事实核查意图",
+  "multi-perspective-solution": "多视角解决问题意图",
+  "first-principles": "第一性原理意图",
+  "cross-domain-solution": "跨领域借解意图",
+  decision: "选择决策意图",
+  "minimum-experiment": "最小实验意图",
+  "self-understanding": "自我认识意图",
+  "life-direction": "人生方向意图",
+};
 
-function isConceptExplanationPrompt(prompt: Prompt): boolean {
-  const identity = normalize(`${prompt.name} ${prompt.description} ${prompt.useWhen}`);
-  return prompt.category === "学习" && /解释|理解|概念/.test(identity);
+function exampleAffinity(prompt: Prompt, query: string): number {
+  return Math.max(0, ...(prompt.positiveExamples ?? []).map((example) => {
+    if (containsPhrase(query, example)) return 1;
+    return sharedNgramScore(query, example);
+  }));
 }
 
 export function matchedIntent(prompt: Prompt, query: string): string | null {
-  return isConceptExplanationPrompt(prompt) && conceptExplanationSignals.test(normalize(query))
-    ? "概念解释意图"
-    : null;
+  const affinity = exampleAffinity(prompt, normalizeRouteText(query));
+  if (!prompt.intent || affinity < 0.35) return null;
+  return INTENT_LABELS[prompt.intent] ?? `${prompt.intent}意图`;
 }
 
 export function scorePrompt(prompt: Prompt, query: string): number {
@@ -31,14 +48,26 @@ export function scorePrompt(prompt: Prompt, query: string): number {
   if (name === normalizedQuery) score += 100;
   else if (name.includes(normalizedQuery)) score += 60;
 
+  const normalizedRouteQuery = normalizeRouteText(query);
+  const positiveExampleScore = Math.max(0, ...(prompt.positiveExamples ?? []).map((example) => {
+    if (containsPhrase(normalizedRouteQuery, example)) return 120;
+    const affinity = sharedNgramScore(normalizedRouteQuery, example);
+    return affinity >= 0.35 ? Math.round(affinity * 60) : 0;
+  }));
+  const negativeExamplePenalty = (prompt.negativeExamples ?? []).reduce((total, example) => {
+    if (containsPhrase(normalizedRouteQuery, example)) return total + 140;
+    const affinity = sharedNgramScore(normalizedRouteQuery, example);
+    return total + (affinity >= 0.6 ? Math.round(affinity * 70) : 0);
+  }, 0);
+  score += positiveExampleScore - negativeExamplePenalty;
+
   const keywordHits = keywords.filter((keyword) => keyword && (normalizedQuery.includes(keyword) || keyword.includes(normalizedQuery)));
-  score += Math.min(keywordHits.length * 35, 70);
+  score += Math.min(keywordHits.reduce((total, keyword) => total + (GENERIC_WORDS.has(keyword) ? 8 : 25), 0), 70);
   if (category.includes(normalizedQuery) || normalizedQuery.includes(category) && category !== "未分类") score += 30;
   if (description.includes(normalizedQuery)) score += 20;
   if (useWhen.includes(normalizedQuery)) score += 20;
   if (body.includes(normalizedQuery)) score += 10;
-  if (matchedIntent(prompt, normalizedQuery)) score += 70;
-  return score;
+  return Math.max(0, score);
 }
 
 export function searchPrompts(prompts: Prompt[], query: string): PromptSearchResult[] {

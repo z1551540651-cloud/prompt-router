@@ -33,6 +33,8 @@ const twoLayer = prompt({
   useWhen: "适用于看不懂技术、概念或名词，想从小白到专业理解的情况",
   category: "学习",
   keywords: ["学习", "概念", "听不懂", "解释", "小白", "专业"],
+  intent: "concept-explanation",
+  positiveExamples: ["地球为什么是圆的"],
 });
 
 describe("hybrid prompt router", () => {
@@ -85,5 +87,12 @@ describe("hybrid prompt router", () => {
 
     expect(result.status).toBe("needsManualChoice");
     expect(result.providerUsed).toBe(false);
+  });
+
+  it("returns no candidates when local rules have no evidence", async () => {
+    const result = await routeQuestion("今天晚上吃什么", [twoLayer, steelman]);
+
+    expect(result.status).toBe("needsManualChoice");
+    expect(result.candidates).toEqual([]);
   });
 });
