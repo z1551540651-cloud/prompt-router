@@ -6,6 +6,7 @@ import { promisify } from "node:util";
 import { PromptStore } from "./core/prompt-store";
 import { searchPrompts } from "./core/search";
 import { routeQuestion } from "./core/router";
+import { applyRoutingDefaults } from "./core/routing-defaults";
 import { shouldReopenPanel } from "./core/use-feedback";
 import type { AppSettings, PasteResult, Prompt } from "./core/types";
 
@@ -16,6 +17,7 @@ let panel: BrowserWindow | null = null;
 let store: PromptStore | null = null;
 let settings: AppSettings | null = null;
 let stopStoreWatch: (() => void) | null = null;
+let bundledPromptsById = new Map<string, Prompt>();
 
 function settingsPath(): string {
   return join(app.getPath("userData"), "settings.json");
@@ -56,6 +58,11 @@ async function seedPromptDirectory(directory: string): Promise<void> {
   for (const file of bundled.filter((item) => item.toLowerCase().endsWith(".md"))) {
     await copyFile(join(bundledDirectory, file), join(directory, file));
   }
+}
+
+async function loadPrompts(): Promise<Prompt[]> {
+  const prompts = await store?.loadAll() ?? [];
+  return prompts.map((prompt) => applyRoutingDefaults(prompt, bundledPromptsById.get(prompt.id)));
 }
 
 function createPanel(): BrowserWindow {
@@ -115,9 +122,9 @@ async function pasteIntoPreviousApp(): Promise<PasteResult> {
 }
 
 function registerIpc(): void {
-  ipcMain.handle("list-prompts", async () => store?.loadAll() ?? []);
-  ipcMain.handle("search-prompts", async (_event, query: string) => searchPrompts(await store?.loadAll() ?? [], query));
-  ipcMain.handle("route-question", async (_event, question: string) => routeQuestion(question, await store?.loadAll() ?? []));
+  ipcMain.handle("list-prompts", async () => loadPrompts());
+  ipcMain.handle("search-prompts", async (_event, query: string) => searchPrompts(await loadPrompts(), query));
+  ipcMain.handle("route-question", async (_event, question: string) => routeQuestion(question, await loadPrompts()));
   ipcMain.handle("save-prompt", async (_event, prompt: Prompt) => {
     if (!store) throw new Error("提示词库尚未准备好");
     return store.save(prompt);
@@ -147,6 +154,8 @@ function registerIpc(): void {
 
 async function bootstrap(): Promise<void> {
   await app.whenReady();
+  const bundledPrompts = await new PromptStore(join(app.getAppPath(), "prompts")).loadAll();
+  bundledPromptsById = new Map(bundledPrompts.map((prompt) => [prompt.id, prompt]));
   const currentSettings = await readSettings();
   await seedPromptDirectory(currentSettings.promptDirectory);
   store = new PromptStore(currentSettings.promptDirectory);
