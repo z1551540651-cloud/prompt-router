@@ -2,6 +2,7 @@
 id: cross-domain-solution
 name: 跨领域借解
 description: 从三个距离较远的领域寻找结构相似的问题和可迁移机制
+useWhen: 适用于本行业的常规办法失效，想借用其他行业解法的情况
 category: 解决问题
 keywords: [跨领域, 借解, 类比, 机制, 历史案例, 灵感]
 variables: [背景、当前做法、现实约束和具体卡点]

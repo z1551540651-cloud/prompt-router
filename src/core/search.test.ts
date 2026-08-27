@@ -8,6 +8,7 @@ function prompt(overrides: Partial<Prompt>): Prompt {
     fileName: "demo.md",
     name: "普通提示词",
     description: "一个普通模板",
+    useWhen: "适用于普通情况",
     category: "其他",
     keywords: [],
     variables: [],

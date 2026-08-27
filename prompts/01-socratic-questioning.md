@@ -2,6 +2,7 @@
 id: socratic-questioning
 name: 苏格拉底式提问
 description: 通过最多6个问题，把混乱的困惑整理成真正值得回答的问题
+useWhen: 适用于不知道自己真正想问什么、问题很乱或卡在表述上的情况
 category: 问清问题
 keywords: [困惑, 问题, 问清楚, 追问, 苏格拉底]
 variables: [困惑]

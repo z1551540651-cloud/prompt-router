@@ -2,6 +2,7 @@
 id: horizontal-vertical-analysis
 name: 横纵分析法
 description: 从历史演化和当下横向比较两个维度，完成可追溯研究
+useWhen: 适用于研究公司、产品、行业、技术或竞品，想系统了解来龙去脉的情况
 category: 学习
 keywords: [研究, 深度研究, 调研, 行业, 公司, 产品, 竞品, 横向, 纵向]
 variables: [研究对象]

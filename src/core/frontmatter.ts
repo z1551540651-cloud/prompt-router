@@ -1,6 +1,6 @@
 import type { Prompt } from "./types";
 
-const SUPPORTED_KEYS = new Set(["id", "name", "description", "category", "keywords", "variables"]);
+const SUPPORTED_KEYS = new Set(["id", "name", "description", "useWhen", "category", "keywords", "variables"]);
 
 function cleanScalar(value: string): string {
   const trimmed = value.trim();
@@ -53,12 +53,13 @@ export function parsePromptMarkdown(fileName: string, source: string): Prompt {
   const id = typeof fields.id === "string" && fields.id ? fields.id : slugFromFileName(fileName);
   const name = typeof fields.name === "string" && fields.name ? fields.name : id;
   const description = typeof fields.description === "string" ? fields.description : "";
+  const useWhen = typeof fields.useWhen === "string" ? fields.useWhen : description;
   const category = typeof fields.category === "string" && fields.category ? fields.category : "未分类";
   const keywords = Array.isArray(fields.keywords) ? fields.keywords : [];
   const variables = Array.isArray(fields.variables) ? fields.variables : [];
   const body = bodyLines.join("\n").replace(/^\n+/, "").replace(/\n+$/, "");
 
-  return { id, fileName, name, description, category, keywords, variables, body, rawFrontmatter };
+  return { id, fileName, name, description, useWhen, category, keywords, variables, body, rawFrontmatter };
 }
 
 function formatList(values: string[]): string {
@@ -78,6 +79,7 @@ export function serializePromptMarkdown(prompt: Prompt): string {
   frontmatter = upsertLine(frontmatter, "id", prompt.id);
   frontmatter = upsertLine(frontmatter, "name", prompt.name);
   frontmatter = upsertLine(frontmatter, "description", prompt.description);
+  frontmatter = upsertLine(frontmatter, "useWhen", prompt.useWhen);
   frontmatter = upsertLine(frontmatter, "category", prompt.category);
   frontmatter = upsertLine(frontmatter, "keywords", formatList(prompt.keywords));
   frontmatter = upsertLine(frontmatter, "variables", formatList(prompt.variables));

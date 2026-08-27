@@ -2,6 +2,7 @@
 id: expert-consultation
 name: 专家会诊
 description: 选择三种互补视角并互相质疑，形成有条件的综合判断
+useWhen: 适用于一个问题同时涉及产品、技术、运营、资源和风险多个方面的情况
 category: 解决问题
 keywords: [解决问题, 专家, 会诊, 方案, 风险, 多视角, 质疑]
 variables: [问题、已知事实、目标和现实约束]

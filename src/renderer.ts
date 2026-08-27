@@ -11,6 +11,7 @@ type Mode = "search" | "route";
 const mainInput = document.querySelector<HTMLTextAreaElement>("#main-input")!;
 const inputLabel = document.querySelector<HTMLLabelElement>("#input-label")!;
 const runButton = document.querySelector<HTMLButtonElement>("#run-button")!;
+const routeShortcut = document.querySelector<HTMLButtonElement>("#route-shortcut")!;
 const resultsElement = document.querySelector<HTMLElement>("#results")!;
 const editorElement = document.querySelector<HTMLElement>("#editor")!;
 const statusElement = document.querySelector<HTMLElement>("#status")!;
@@ -40,6 +41,7 @@ function updateModeUi(): void {
   inputLabel.textContent = routeMode ? "描述你现在遇到的问题" : "搜索名称、分类、关键词";
   mainInput.placeholder = routeMode ? "例如：我在两个选项之间犹豫，不知道该选哪个" : "例如：双向钢人论证、事实核查";
   runButton.textContent = routeMode ? "开始匹配" : "搜索";
+  routeShortcut.classList.toggle("hidden", routeMode);
   selectedIndex = 0;
   routeResult = null;
   editorElement.classList.add("hidden");
@@ -57,7 +59,7 @@ function renderSearchResults(): void {
       <div>
         <div class="meta">${escapeHtml(prompt.category)}${score ? ` · 匹配 ${score}` : ""}</div>
         <h3>${escapeHtml(prompt.name)}</h3>
-        <p>${escapeHtml(prompt.description || prompt.body.slice(0, 120))}</p>
+        <p><span class="usage-label">适用：</span>${escapeHtml(prompt.useWhen || prompt.description || prompt.body.slice(0, 120))}</p>
       </div>
       <div class="card-actions">
         <button class="secondary-button" data-action="edit" data-index="${index}">编辑</button>
@@ -81,7 +83,7 @@ function renderRouteResults(): void {
       <div>
         <div class="meta">${escapeHtml(candidate.prompt.category)} · 评分 ${candidate.score}</div>
         <h3>${escapeHtml(candidate.prompt.name)}</h3>
-        <p>${escapeHtml(candidate.reason)}。${escapeHtml(candidate.prompt.description)}</p>
+        <p>${escapeHtml(candidate.reason)}。<span class="usage-label">适用：</span>${escapeHtml(candidate.prompt.useWhen || candidate.prompt.description)}</p>
       </div>
       <div class="card-actions">
         <button class="secondary-button" data-action="edit" data-index="${index}">编辑</button>
@@ -207,6 +209,7 @@ async function runRoute(): Promise<void> {
 modeButtons.forEach((button) => button.addEventListener("click", () => {
   mode = button.dataset.mode as Mode;
   updateModeUi();
+  if (mode === "route" && mainInput.value.trim()) void runRoute();
 }));
 
 mainInput.addEventListener("input", () => {
@@ -216,6 +219,16 @@ mainInput.addEventListener("input", () => {
 runButton.addEventListener("click", () => {
   if (mode === "search") void refreshSearch();
   else void runRoute();
+});
+
+routeShortcut.addEventListener("click", () => {
+  mode = "route";
+  updateModeUi();
+  if (mainInput.value.trim()) void runRoute();
+  else {
+    mainInput.focus();
+    setStatus("把你的问题写进来，我会帮你挑提示词");
+  }
 });
 
 mainInput.addEventListener("keydown", (event) => {

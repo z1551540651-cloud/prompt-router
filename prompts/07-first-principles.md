@@ -2,6 +2,7 @@
 id: first-principles
 name: 第一性原理
 description: 放下行业惯例，从基本事实、目标和约束重新推导路径
+useWhen: 适用于现有流程不断打补丁、方案越来越复杂，想从本质重新思考的情况
 category: 解决问题
 keywords: [第一性原理, 本质, 架构, 流程, 路径依赖, 重构]
 variables: [问题]

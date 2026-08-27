@@ -2,6 +2,7 @@
 id: fact-checking
 name: 事实核查
 description: 区分事实、推断和价值判断，检查证据与推理链
+useWhen: 适用于判断一条新闻、数据、观点或方案到底靠不靠谱的情况
 category: 学习
 keywords: [核查, 事实, 真假, 证据, 幻觉, 数据, 观点]
 variables: [说法]

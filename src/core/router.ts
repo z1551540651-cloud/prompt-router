@@ -7,6 +7,7 @@ function reasonFor(prompt: Prompt, question: string, score: number): string {
   if (hits.length) return `命中关键词：${hits.join("、")}`;
   if (prompt.name.toLocaleLowerCase("zh-CN").includes(lowerQuestion)) return "匹配提示词名称";
   if (prompt.category && lowerQuestion.includes(prompt.category.toLocaleLowerCase("zh-CN"))) return `匹配分类：${prompt.category}`;
+  if (prompt.useWhen && prompt.useWhen.toLocaleLowerCase("zh-CN").includes(lowerQuestion)) return "匹配适用场景";
   if (score > 0) return "匹配提示词描述或正文";
   return "本地规则没有找到高置信度匹配";
 }

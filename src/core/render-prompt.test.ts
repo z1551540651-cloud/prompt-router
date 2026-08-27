@@ -7,6 +7,7 @@ const sample: Prompt = {
   fileName: "demo.md",
   name: "模板",
   description: "",
+  useWhen: "适用于测试",
   category: "测试",
   keywords: [],
   variables: ["问题", "目标"],

@@ -2,6 +2,7 @@
 id: reverse-deconstruction
 name: 反向拆解
 description: 从优秀成品反向拆出结构、关键选择和可迁移规律
+useWhen: 适用于看到好产品、网站、视频或方案，想模仿其做法的情况
 category: 学习
 keywords: [拆解, 模仿, 学习, 网站, 产品, 成品, 作品]
 variables: [优秀范例, 想学会的内容]

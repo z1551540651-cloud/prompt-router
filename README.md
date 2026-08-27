@@ -37,6 +37,7 @@ Windows 使用 PowerShell 的键盘模拟完成自动粘贴；遇到管理员权
 id: example
 name: 示例提示词
 description: 用途说明
+useWhen: 适用于什么情况
 category: 决策
 keywords: [选择, 对比]
 variables: [问题, 目标]

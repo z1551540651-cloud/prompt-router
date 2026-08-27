@@ -2,6 +2,7 @@
 id: minimum-experiment
 name: 用最小实验替代空想
 description: 找出最关键假设，用低成本、可逆实验获得现实反馈
+useWhen: 适用于不确定要不要买、要不要做或要不要换，想先低成本试试的情况
 category: 决策
 keywords: [实验, 验证, 低成本, 可逆, 试错, 决策, 假设]
 variables: [选择或想法, 周期]

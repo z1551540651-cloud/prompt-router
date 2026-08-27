@@ -3,6 +3,7 @@ export type Prompt = {
   fileName: string;
   name: string;
   description: string;
+  useWhen: string;
   category: string;
   keywords: string[];
   variables: string[];

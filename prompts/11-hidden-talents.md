@@ -2,6 +2,7 @@
 id: hidden-talents
 name: 挖掘隐藏天赋
 description: 通过具体经历、能量模式和阴影线索，寻找可迁移的底层能力
+useWhen: 适用于想了解自己的优势、适合什么工作以及为什么擅长某些事的情况
 category: 认识自己
 keywords: [天赋, 优势, 心流, 生涯, 能量, 怪癖, 嫉妒, 自我认识]
 variables: []

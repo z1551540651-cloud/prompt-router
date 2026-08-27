@@ -2,6 +2,7 @@
 id: life-design
 name: 人生设计术
 description: 用人生设计方法看清现状、生成多条未来路径，并用原型行动验证
+useWhen: 适用于对未来工作、生活方向迷茫，想设计多条可能路径的情况
 category: 认识自己
 keywords: [人生, 规划, 未来, 职业, 方向, 设计, 原型, 奥德赛]
 variables: []

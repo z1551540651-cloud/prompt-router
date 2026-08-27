@@ -10,6 +10,7 @@ export function scorePrompt(prompt: Prompt, query: string): number {
   const name = normalize(prompt.name);
   const category = normalize(prompt.category);
   const description = normalize(prompt.description);
+  const useWhen = normalize(prompt.useWhen);
   const body = normalize(prompt.body);
   const keywords = prompt.keywords.map(normalize);
   let score = 0;
@@ -21,6 +22,7 @@ export function scorePrompt(prompt: Prompt, query: string): number {
   score += Math.min(keywordHits.length * 35, 70);
   if (category.includes(normalizedQuery) || normalizedQuery.includes(category) && category !== "未分类") score += 30;
   if (description.includes(normalizedQuery)) score += 20;
+  if (useWhen.includes(normalizedQuery)) score += 20;
   if (body.includes(normalizedQuery)) score += 10;
   return score;
 }
