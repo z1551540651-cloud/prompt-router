@@ -26,6 +26,15 @@ const steelman = prompt({
   keywords: ["犹豫", "选择", "决定"],
 });
 
+const twoLayer = prompt({
+  id: "two-layer-explanation",
+  name: "双层解释法",
+  description: "用小白版和专业版解释一个陌生概念",
+  useWhen: "适用于看不懂技术、概念或名词，想从小白到专业理解的情况",
+  category: "学习",
+  keywords: ["学习", "概念", "听不懂", "解释", "小白", "专业"],
+});
+
 describe("hybrid prompt router", () => {
   it("recognizes a decision question with local rules", async () => {
     const result = await routeQuestion("我在两个选择之间犹豫，今天要做决定", [steelman, prompt({ id: "other" })]);
@@ -47,6 +56,14 @@ describe("hybrid prompt router", () => {
 
     expect(result.status).toBe("matched");
     expect(result.candidates[0]?.prompt.id).toBe("two-sided-steelman");
+  });
+
+  it("recognizes a general why question as a concept explanation", async () => {
+    const result = await routeQuestion("地球为什么是圆的", [twoLayer, steelman]);
+
+    expect(result.status).toBe("matched");
+    expect(result.candidates[0]?.prompt.id).toBe("two-layer-explanation");
+    expect(result.candidates[0]?.reason).toBe("识别到概念解释意图");
   });
 
   it("uses provider ids when local rules are inconclusive", async () => {

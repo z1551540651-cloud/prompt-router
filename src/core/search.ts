@@ -4,6 +4,19 @@ function normalize(value: string): string {
   return value.trim().toLocaleLowerCase("zh-CN");
 }
 
+const conceptExplanationSignals = /为什么|是什么|怎么理解|原理|如何工作|怎么运作|解释一下|讲清楚/;
+
+function isConceptExplanationPrompt(prompt: Prompt): boolean {
+  const identity = normalize(`${prompt.name} ${prompt.description} ${prompt.useWhen}`);
+  return prompt.category === "学习" && /解释|理解|概念/.test(identity);
+}
+
+export function matchedIntent(prompt: Prompt, query: string): string | null {
+  return isConceptExplanationPrompt(prompt) && conceptExplanationSignals.test(normalize(query))
+    ? "概念解释意图"
+    : null;
+}
+
 export function scorePrompt(prompt: Prompt, query: string): number {
   const normalizedQuery = normalize(query);
   if (!normalizedQuery) return 0;
@@ -24,6 +37,7 @@ export function scorePrompt(prompt: Prompt, query: string): number {
   if (description.includes(normalizedQuery)) score += 20;
   if (useWhen.includes(normalizedQuery)) score += 20;
   if (body.includes(normalizedQuery)) score += 10;
+  if (matchedIntent(prompt, normalizedQuery)) score += 70;
   return score;
 }
 

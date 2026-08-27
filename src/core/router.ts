@@ -1,4 +1,4 @@
-import { searchPrompts } from "./search";
+import { matchedIntent, searchPrompts } from "./search";
 import type { Prompt, RouteCandidate, RouteProvider, RouteResult } from "./types";
 
 function reasonFor(prompt: Prompt, question: string, score: number): string {
@@ -8,6 +8,8 @@ function reasonFor(prompt: Prompt, question: string, score: number): string {
   if (prompt.name.toLocaleLowerCase("zh-CN").includes(lowerQuestion)) return "匹配提示词名称";
   if (prompt.category && lowerQuestion.includes(prompt.category.toLocaleLowerCase("zh-CN"))) return `匹配分类：${prompt.category}`;
   if (prompt.useWhen && prompt.useWhen.toLocaleLowerCase("zh-CN").includes(lowerQuestion)) return "匹配适用场景";
+  const intent = matchedIntent(prompt, question);
+  if (intent) return `识别到${intent}`;
   if (score > 0) return "匹配提示词描述或正文";
   return "本地规则没有找到高置信度匹配";
 }
