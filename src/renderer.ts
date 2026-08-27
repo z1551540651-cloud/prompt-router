@@ -1,5 +1,5 @@
 import type { Prompt, PromptRouterApi, PromptSearchResult, RouteCandidate, RouteResult } from "./core/types";
-import { renderPrompt } from "./core/render-prompt";
+import { renderPrompt } from "./core/render-prompt.js";
 
 declare global {
   interface Window {
