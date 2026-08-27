@@ -126,6 +126,10 @@ function renderEditor(prompt: Prompt): void {
       <div class="field full"><label for="edit-description">用途说明</label><input id="edit-description" value="${escapeHtml(prompt.description)}" /></div>
       <div class="field full"><label for="edit-keywords">关键词（用逗号分隔）</label><input id="edit-keywords" value="${escapeHtml(prompt.keywords.join(", "))}" /></div>
       <div class="field full"><label for="edit-variables">变量（用逗号分隔）</label><input id="edit-variables" value="${escapeHtml(prompt.variables.join(", "))}" /></div>
+      <div class="field"><label for="edit-intent">路由意图</label><input id="edit-intent" value="${escapeHtml(prompt.intent ?? "")}" /></div>
+      <div class="field"><label for="edit-primary-variable">主要填充字段</label><input id="edit-primary-variable" value="${escapeHtml(prompt.primaryVariable ?? "")}" /></div>
+      <div class="field full"><label for="edit-positive-examples">适用示例（用逗号分隔）</label><textarea id="edit-positive-examples" rows="3">${escapeHtml((prompt.positiveExamples ?? []).join(", "))}</textarea></div>
+      <div class="field full"><label for="edit-negative-examples">不适用示例（用逗号分隔）</label><textarea id="edit-negative-examples" rows="3">${escapeHtml((prompt.negativeExamples ?? []).join(", "))}</textarea></div>
       <div class="field full"><label for="edit-body">提示词正文</label><textarea id="edit-body" rows="11">${escapeHtml(prompt.body)}</textarea></div>
     </div>
     <div class="editor-actions"><button id="cancel-edit" class="secondary-button">取消</button><button id="save-edit" class="primary-button">保存修改</button></div>
@@ -147,6 +151,10 @@ function promptFromEditor(): Prompt | null {
     description: valueOf("edit-description"),
     keywords: valueOf("edit-keywords").split(",").map((item) => item.trim()).filter(Boolean),
     variables: valueOf("edit-variables").split(",").map((item) => item.trim()).filter(Boolean),
+    intent: valueOf("edit-intent") || undefined,
+    primaryVariable: valueOf("edit-primary-variable") || undefined,
+    positiveExamples: valueOf("edit-positive-examples").split(",").map((item) => item.trim()).filter(Boolean),
+    negativeExamples: valueOf("edit-negative-examples").split(",").map((item) => item.trim()).filter(Boolean),
     body: valueOf("edit-body"),
   };
 }

@@ -4,7 +4,7 @@ name: 双层解释法
 description: 用小白版和专业版解释一个陌生概念，并检查是否真正理解
 useWhen: 适用于看不懂技术、概念或数据库名词，想从小白到专业理解的情况
 category: 学习
-keywords: [学习, 概念, 听不懂, 解释, 小白, 专业]
+keywords: [学习, 概念, 听不懂, 解释, 小白, 专业, 为什么, 是什么, 原理, 如何工作, 怎么工作, 怎么理解, 讲清楚]
 variables: [概念或问题]
 intent: concept-explanation
 positiveExamples: [地球为什么是圆的, Docker 是怎么工作的, 这个概念到底是什么, 请用小白能懂的方式解释, 我听不懂这个技术名词, 这个原理怎么理解]

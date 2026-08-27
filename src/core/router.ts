@@ -27,7 +27,9 @@ function localResult(question: string, prompts: Prompt[]): RouteResult {
   const candidates = localCandidates(question, prompts);
   const topScore = candidates[0]?.score ?? 0;
   const secondScore = candidates[1]?.score ?? 0;
-  const confident = topScore >= 80 || topScore >= 45 && topScore - secondScore >= 25;
+  const confident = topScore >= 80
+    || topScore >= 30 && topScore - secondScore >= 15
+    || topScore >= 20 && secondScore === 0;
   return { status: confident ? "matched" : "needsManualChoice", candidates, providerUsed: false };
 }
 

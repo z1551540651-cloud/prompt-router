@@ -42,7 +42,7 @@ export function scorePrompt(prompt: Prompt, query: string): number {
   const description = normalize(prompt.description);
   const useWhen = normalize(prompt.useWhen);
   const body = normalize(prompt.body);
-  const keywords = prompt.keywords.map(normalize);
+  const keywords = prompt.keywords.map(normalizeRouteText);
   let score = 0;
 
   if (name === normalizedQuery) score += 100;
@@ -61,7 +61,7 @@ export function scorePrompt(prompt: Prompt, query: string): number {
   }, 0);
   score += positiveExampleScore - negativeExamplePenalty;
 
-  const keywordHits = keywords.filter((keyword) => keyword && (normalizedQuery.includes(keyword) || keyword.includes(normalizedQuery)));
+  const keywordHits = keywords.filter((keyword) => keyword && (normalizedRouteQuery.includes(keyword) || keyword.includes(normalizedRouteQuery)));
   score += Math.min(keywordHits.reduce((total, keyword) => total + (GENERIC_WORDS.has(keyword) ? 8 : 25), 0), 70);
   if (category.includes(normalizedQuery) || normalizedQuery.includes(category) && category !== "未分类") score += 30;
   if (description.includes(normalizedQuery)) score += 20;
