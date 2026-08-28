@@ -240,6 +240,7 @@ async function runRoute(): Promise<void> {
     routeResult = await window.promptRouter.routeQuestion(question);
     selectedIndex = 0;
     renderResults();
+    setStatus("");
   } catch (error) {
     setStatus(error instanceof Error ? error.message : "自动匹配失败", true);
   } finally {

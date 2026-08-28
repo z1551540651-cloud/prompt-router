@@ -127,6 +127,16 @@ function loadBundledPrompts() {
 }
 
 describe("100-question local router coverage", () => {
+  it("routes broad learning requests to the two-layer explanation prompt", async () => {
+    const prompts = loadBundledPrompts();
+
+    for (const question of ["我想学金融知识", "我想学习摄影基础"]) {
+      const result = await routeQuestion(question, prompts);
+      expect(result.status, question).toBe("matched");
+      expect(result.candidates[0]?.prompt.id, question).toBe("two-layer-explanation");
+    }
+  });
+
   it("routes at least 90 of 96 clear questions with high confidence", async () => {
     const prompts = loadBundledPrompts();
     const results = await Promise.all(clearCases.map(async (item) => ({
