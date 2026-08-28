@@ -80,8 +80,7 @@ function createPanel(): BrowserWindow {
       preload: join(__dirname, "preload.js"),
     },
   });
-  nextPanel.loadFile(join(app.getAppPath(), "index.html"));
-  nextPanel.once("ready-to-show", () => nextPanel.show());
+  void nextPanel.loadFile(join(app.getAppPath(), "index.html")).then(() => nextPanel.show());
   nextPanel.on("closed", () => { panel = null; });
   return nextPanel;
 }
@@ -163,7 +162,15 @@ async function bootstrap(): Promise<void> {
   registerIpc();
   panel = createPanel();
   globalShortcut.register(currentSettings.hotkey, togglePanel);
-  app.on("activate", () => { if (!panel) panel = createPanel(); else togglePanel(); });
+  app.on("activate", () => {
+    if (!panel) {
+      panel = createPanel();
+      return;
+    }
+    panel.show();
+    panel.focus();
+    panel.webContents.send("panel-opened");
+  });
   app.on("will-quit", () => {
     stopStoreWatch?.();
     globalShortcut.unregisterAll();
