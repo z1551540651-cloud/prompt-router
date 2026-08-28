@@ -154,7 +154,7 @@ function registerIpc(): void {
 
 async function bootstrap(): Promise<void> {
   await app.whenReady();
-  const bundledPrompts = await new PromptStore(join(app.getAppPath(), "prompts")).loadAll();
+  const bundledPrompts = await new PromptStore(join(app.getAppPath(), "prompts")).loadAll({ ensureDirectory: false });
   bundledPromptsById = new Map(bundledPrompts.map((prompt) => [prompt.id, prompt]));
   const currentSettings = await readSettings();
   await seedPromptDirectory(currentSettings.promptDirectory);

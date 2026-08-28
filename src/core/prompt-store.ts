@@ -9,8 +9,10 @@ export class PromptStore {
 
   constructor(private readonly directory: string) {}
 
-  async loadAll(): Promise<Prompt[]> {
-    await mkdir(this.directory, { recursive: true });
+  async loadAll(options: { ensureDirectory?: boolean } = {}): Promise<Prompt[]> {
+    if (options.ensureDirectory !== false) {
+      await mkdir(this.directory, { recursive: true });
+    }
     this.errors = [];
     const entries = await readdir(this.directory, { withFileTypes: true });
     const prompts: Prompt[] = [];

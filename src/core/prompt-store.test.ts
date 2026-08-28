@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, readdir, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -19,6 +19,15 @@ describe("PromptStore", () => {
 
     expect(prompts).toHaveLength(1);
     expect(prompts[0]?.name).toBe("一个");
+  });
+
+  it("does not create a missing read-only prompt directory", async () => {
+    const root = await tempPromptDir();
+    const directory = join(root, "bundled-prompts");
+    const store = new PromptStore(directory);
+
+    await expect(store.loadAll({ ensureDirectory: false })).rejects.toMatchObject({ code: "ENOENT" });
+    await expect(stat(directory)).rejects.toMatchObject({ code: "ENOENT" });
   });
 
   it("backs up an existing prompt before saving", async () => {
